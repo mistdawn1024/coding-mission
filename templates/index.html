@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>论文阅读助手 - AI学术助手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 头部样式 */
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        /* 搜索区域 */
+        .search-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        /* 过滤选项 */
+        .filters {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group label {
+            font-weight: 500;
+        }
+
+        select, input[type="number"] {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+        }
+
+        /* 论文列表 */
+        .papers-list {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .paper-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .paper-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+
+        .paper-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .paper-authors {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .paper-summary {
+            color: #888;
+            font-size: 0.9em;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .paper-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85em;
+            color: #999;
+        }
+
+        /* 侧边栏 */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .qa-section {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .qa-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .qa-question {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .qa-answer {
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .question-input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .trend-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-box {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+        
+        /* 动画 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .paper-card {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        /* 进度条 */
+        .progress-bar {
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            animation: loading 1s infinite;
+        }
+        
+        @keyframes loading {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 论文阅读助手</h1>
+            <p class="subtitle">AI驱动的学术研究助手 | 智能追踪 | 深度分析 | 即时问答</p>
+        </div>
+        
+        <div class="search-section">
+            <div class="search-box">
+                <input type="text" id="searchQuery" class="search-input" placeholder="输入搜索关键词，例如：deep learning, transformer, GPT..." value="artificial intelligence">
+                <button class="btn" onclick="searchPapers()">🔍 搜索论文</button>
+                <button class="btn btn-secondary" onclick="getTrending()">🔥 热门论文</button>
+            </div>
+            <div class="filters">
+                <div class="filter-group">
+                    <label>排序方式:</label>
+                    <select id="sortBy">
+                        <option value="relevance">相关性</option>
+                        <option value="date">最新发表</option>
+                        <option value="citation">引用量</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>结果数量:</label>
+                    <input type="number" id="maxResults" value="20" min="1" max="50">
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="papers-list" id="papersList">
+                <div class="loading">✨ 点击搜索开始探索学术世界...</div>
+            </div>
+            
+            <div class="sidebar">
+                <div class="card">
+                    <h3>💬 智能问答</h3>
+                    <div id="qaHistory" class="qa-section">
+                        <div class="qa-item">
+                            <div class="qa-question">🤖 助手提示</div>
+                            <div class="qa-answer">您可以问我关于论文总结、研究趋势、论文推荐等问题！</div>
+                        </div>
+                    </div>
+                    <input type="text" id="questionInput" class="question-input" placeholder="输入您的问题..." 
+                           onkeypress="if(event.keyCode==13) askQuestion()">
+                    <button class="btn" onclick="askQuestion()" style="margin-top: 10px; width: 100%">提问</button>
+                </div>
+                
+                <div class="card">
+                    <h3>📊 研究趋势</h3>
+                    <div id="trendsContent">
+                        <button class="btn" onclick="analyzeTrends()" style="width: 100%">分析趋势</button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>📝 文献综述</h3>
+                    <input type="text" id="topicInput" class="question-input" placeholder="输入研究主题" value="人工智能">
+                    <button class="btn" onclick="generateReview()" style="margin-top: 10px; width: 100%">生成综述</button>
+                    <div id="reviewContent" style="margin-top: 15px; font-size: 0.9em;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentPapers = [];
+        
+        async function searchPapers() {
+            const query = document.getElementById('searchQuery').value;
+            const maxResults = document.getElementById('maxResults').value;
+            const sortBy = document.getElementById('sortBy').value;
+            
+            showLoading('papersList');
+            
+            try {
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        query: query,
+                        max_results: parseInt(maxResults),
+                        sort_by: sortBy,
+                        rank_criteria: sortBy
+                    })
+                });
+                
+                const data = await response.json();
+                currentPapers = data.papers;
+                displayPapers(data.papers);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('papersList').innerHTML = '<div class="loading">❌ 搜索失败，请重试</div>';
+            }
+        }
+        
+        async function getTrending() {
+            showLoading('papersList');
+            
+            try {
+                const response = await fetch('/api/trending', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({field: 'cs.AI', days: 7})
+                });
+                
+                const data = await response.json();
+                currentPapers = data.papers;
+                displayPapers(data.papers);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('papersList').innerHTML = '<div class="loading">❌ 获取热门论文失败</div>';
+            }
+        }
+        
+        function displayPapers(papers) {
+            const container = document.getElementById('papersList');
+            
+            if (!papers || papers.length === 0) {
+                container.innerHTML = '<div class="loading">😔 没有找到相关论文</div>';
+                return;
+            }
+            
+            container.innerHTML = papers.map(paper => `
+                <div class="paper-card" onclick="selectPaper(${JSON.stringify(paper).replace(/"/g, '&quot;')})">
+                    <div class="paper-title">📄 ${paper.title}</div>
+                    <div class="paper-authors">✍️ ${paper.authors.slice(0, 3).join(', ')}${paper.authors.length > 3 ? ' et al.' : ''}</div>
+                    <div class="paper-summary">${paper.summary.substring(0, 200)}...</div>
+                    <div class="paper-meta">
+                        <span>📅 ${paper.published}</span>
+                        <span>🔗 <a href="${paper.pdf_url}" target="_blank" onclick="event.stopPropagation()">PDF链接</a></span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function selectPaper(paper) {
+            addToQAHistory('系统', `已选择论文: ${paper.title}`);
+            // 调用总结API
+            fetch('/api/summarize', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({content: paper.summary})  // 确保字段名是 content
+            })
+            .then(res => res.json())
+            .then(data => {
+                addToQAHistory('助手', `📝 论文总结:\n${data.abstract_summary || data}\n\n💡 关键点:\n${(data.key_points || []).join('\n')}`);
+            })
+            .catch(err => {
+                addToQAHistory('助手', '总结生成失败，请重试。');
+            });
+}
+        
+        async function askQuestion() {
+            const question = document.getElementById('questionInput').value;
+            if (!question.trim()) return;
+            
+            addToQAHistory('您', question);
+            document.getElementById('questionInput').value = '';
+            
+            try {
+                const response = await fetch('/api/question', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({question: question})
+                });
+                
+                const data = await response.json();
+                addToQAHistory('助手', data.answer);
+            } catch (error) {
+                addToQAHistory('助手', '抱歉，我暂时无法回答这个问题。');
+            }
+        }
+        
+        async function analyzeTrends() {
+            const container = document.getElementById('trendsContent');
+            container.innerHTML = '<div class="loading">📊 分析中...</div>';
+            
+            try {
+                const response = await fetch('/api/trends', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({})
+                });
+                
+                const trends = await response.json();
+                
+                container.innerHTML = `
+                    <div class="trend-item">🔥 热门主题: ${trends.hot_topics?.join(', ') || '暂无'}</div>
+                    <div class="trend-item">💡 新兴领域: ${trends.emerging_fields?.join(', ') || '暂无'}</div>
+                    <div class="trend-item">📈 ${trends.publication_trend || '暂无数据'}</div>
+                    <button class="btn" onclick="analyzeTrends()" style="margin-top: 15px; width: 100%">刷新分析</button>
+                `;
+            } catch (error) {
+                container.innerHTML = '<div class="loading">❌ 分析失败</div>';
+            }
+        }
+        
+        async function generateReview() {
+            const topic = document.getElementById('topicInput').value;
+            const reviewDiv = document.getElementById('reviewContent');
+            reviewDiv.innerHTML = '<div class="loading">📝 生成综述中...</div>';
+            
+            try {
+                const response = await fetch('/api/literature-review', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({topic: topic})
+                });
+                
+                const data = await response.json();
+                reviewDiv.innerHTML = `<div style="max-height: 300px; overflow-y: auto; white-space: pre-wrap;">${data.review}</div>`;
+            } catch (error) {
+                reviewDiv.innerHTML = '<div class="loading">❌ 生成失败</div>';
+            }
+        }
+        
+        function addToQAHistory(role, message) {
+            const container = document.getElementById('qaHistory');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'qa-item';
+            messageDiv.innerHTML = `
+                <div class="qa-question">${role === '您' ? '👤 您' : '🤖 助手'}</div>
+                <div class="qa-answer">${message}</div>
+            `;
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+            
+            // 限制历史记录数量
+            while (container.children.length > 20) {
+                container.removeChild(container.firstChild);
+            }
+        }
+        
+        function showLoading(elementId) {
+            document.getElementById(elementId).innerHTML = '<div class="loading"><div class="progress-bar"></div>加载中...</div>';
+        }
+        
+        // 页面加载时自动搜索
+        window.addEventListener('load', () => {
+            searchPapers();
+        });
+    </script>
+</body>
+</html>
