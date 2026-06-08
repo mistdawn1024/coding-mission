@@ -20,7 +20,8 @@ CORS(app)
 # =====================================================
 # DeepSeek API 配置
 # =====================================================
-DEEPSEEK_API_KEY = ''
+# (优先使用环境变量，如果没有则使用空字符串)
+DEEPSEEK_API_KEY = os.environ.get('DEEPSEEK_API_KEY', '')
 DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 # 存储论文数据
