@@ -20,7 +20,7 @@ CORS(app)
 # =====================================================
 # DeepSeek API 配置
 # =====================================================
-DEEPSEEK_API_KEY = 'sk-bbfc0f995aba4308a551e97e99dd9c8f'
+DEEPSEEK_API_KEY = ''
 DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 
 # 存储论文数据
